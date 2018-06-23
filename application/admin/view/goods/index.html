@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>无标题文档</title>
+    <link href="{:config('admin_static')}/css/style.css" rel="stylesheet" type="text/css" />
+    <link href="{:config('admin_static')}/css/page.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="{:config('admin_static')}/js/jquery.js"></script>
+    <script type="text/javascript" src="/plugin/layer/layer.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $(".click").click(function() {
+            $(".tip").fadeIn(200);
+        });
+
+        $(".tiptop a").click(function() {
+            $(".tip").fadeOut(200);
+        });
+
+        $(".sure").click(function() {
+            $(".tip").fadeOut(100);
+        });
+
+        $(".cancel").click(function() {
+            $(".tip").fadeOut(100);
+        });
+
+    });
+    </script>
+</head>
+
+<body>
+    <div class="place">
+        <span>位置：</span>
+        <ul class="placeul">
+            <li><a href="#">首页</a></li>
+            <li><a href="#">数据表</a></li>
+            <li><a href="#">基本内容</a></li>
+        </ul>
+    </div>
+    <div class="rightinfo">
+        <div class="tools">
+            <ul class="toolbar">
+                <li><span><img src="{:config('admin_static')}/images/t01.png" /></span>添加</li>
+                <li><span><img src="{:config('admin_static')}/images/t02.png" /></span>修改</li>
+                <li><span><img src="{:config('admin_static')}/images/t03.png" /></span>删除</li>
+                <li><span><img src="{:config('admin_static')}/images/t04.png" /></span>统计</li>
+            </ul>
+        </div>
+        <table class="tablelist">
+            <thead>
+                <tr>
+                    <th>
+                        <input name="" type="checkbox" value="" id="checkAll" />
+                    </th>
+                    <th>商品名称</th>
+                    <th>商品价格</th>
+                    <th>商品库存</th>
+                    <th>商品图片</th>
+                    <th>是否热卖</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {volist name='lists' id='list'}
+                <tr>
+                    <td>
+                        <input name="" type="checkbox" value="" />
+                    </td>
+                    <td>{$list['goods_name']}</td>
+                    <td>{$list['goods_price']}</td>
+                    <td>{$list['goods_number']}</td>
+                    <td><img src='/upload/{$list.goods_thumb[0]}' alt="暂无图片"></td>
+                    <td><a class='changeActive' goods_id="{$list['goods_id']}" is_hot="{$list['is_hot']}" 
+                        style='cursor: pointer;' href="javascript:;">{$list['is_hot']?"是":'否'}</a></td>
+                    <td>
+                        <a href="javascript:;" goods_id={$list['goods_id']}" class="showContent tablelink">查看商品详情</a> 
+                         <a href="javascript:;" goods_id="{$list['goods_id']}" class="delAttr tablelink ">加入回收站</a> 
+                    </td>
+                </tr>
+               {/volist}
+            </tbody>
+        </table>
+        <div class="pagination">
+            
+        </div>
+        <div class="tip">
+            <div class="tiptop"><span>提示信息</span>
+                <a></a>
+            </div>
+            <div class="tipinfo">
+                <span><img src="{:config('admin_static')}/images/ticon.png" /></span>
+                <div class="tipright">
+                    <p>是否确认对信息的修改 ？</p>
+                    <cite>如果是请点击确定按钮 ，否则请点取消。</cite>
+                </div>
+            </div>
+            <div class="tipbtn">
+                <input name="" type="button" class="sure" value="确定" />&nbsp;
+                <input name="" type="button" class="cancel" value="取消" />
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $('.tablelist tbody tr:odd').addClass('odd');
+        $(".showContent").click(function(){
+            var goods_id=$(this).attr('goods_id');
+            $.get("{:url('admin/goods/ajaxGetContent')}",{"goods_id":goods_id},function(json){
+                console.log(json);
+                layer.open({
+                    title:json.goods.goods_name, 
+                    type: 1,
+                    skin: 'layui-layer-rim', //加上边框
+                    area: ['700px', '500px'], //宽高
+                    content: "<div style='padding:3px'>"+json.goods.goods_desc+"</div>"
+                });
+
+            },'json')
+        })
+        $(".delAttr").click(function(){
+            if(confirm('确认删除') == false){
+                return;
+            }
+            var _self=$(this);
+            var goods_id=_self.attr('goods_id');
+            $.get("{:url('admin/goods/ajaxDel')}",{"goods_id":goods_id},function(data){
+                if(data.code=='200'){
+                    _self.parent().parent().remove();
+                }else{
+                    alert(data.message);
+                }
+            },'json');
+        });
+         $(".changeActive").click(function(){
+            var is_hot = $(this).attr('is_hot');
+            var goods_id = $(this).attr('goods_id');
+            var _self = $(this);
+            $.get("{:url('admin/goods/ajaxChangeActive')}",{"is_hot":is_hot,"goods_id":goods_id},function(json){
+                console.log(json);
+                if(json.status == 200){
+                    //说明更新成功改文字提示且is_hot属性值也要更改过来
+                    _self.html(json.is_hot == 1 ? '是':'否');
+                    _self.attr('is_hot',json.is_hot);
+
+                }else{
+                    alert(json.message);
+                }
+            },'json');
+        });
+    </script>
+</body>
+
+</html>

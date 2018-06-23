@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>无标题文档</title>
+    <link href="{:config('admin_static')}/css/style.css" rel="stylesheet" type="text/css" />
+    <script language="JavaScript" src="{:config('admin_static')}/js/jquery.js"></script>
+    <style>
+        .active{
+            border-bottom: solid 3px #66c9f3;
+        }
+        .box th, .box td{border: 1px solid #ccc;}
+        .box b{color:blue;}
+        li{list-style: none;}
+        .box .ul_f{float:left;padding-right: 15px;} 
+        .box .ul_f li{margin-left: 15px} 
+        .box .son{padding-left: 10px;}
+        th{height: 50px; font-size: 15px;}
+        td{height: 50px;}
+        b{height: 60px;font-size: 15px;}
+        label{font-size: 15px;}
+        #jiaose{height: 50px; width: 400px;}
+
+    </style>
+</head>
+        <form action="" method="post">
+            <ul class="forminfo">
+                <li>
+                    <label>权限名称：</label>
+                    <input name="role_name" id="jiaose" placeholder="请输入角色名称" type="text" class="dfinput" />
+                </li>
+                 <li>
+                    <label>分配权限：</label>
+                    </li>
+                    <table width="800px" border="1px" rules="all" class="box">
+                        <!-- 循环顶级（1级权限） -->
+                    <?php  foreach($children[0] as $one_auth_id):?>
+                        <tr>
+                            <th><input onclick="all_select(this);" type="checkbox" value="<?php echo $one_auth_id; ?>" name="auth_id_list[]"><?php echo $auths[ $one_auth_id ]['auth_name']  ?></th>
+                            <td>
+                                     <!-- 循环顶级（2级权限） -->
+                                <?php  foreach($children[ $one_auth_id ]?:array() as $two_auth_id):?>
+                                <ul class="ul_f">
+                                    <b><input onclick="all_select(this);up_select(this,'{$one_auth_id}')"  type="checkbox" value="<?php echo $two_auth_id; ?>" name="auth_id_list[]"><?php echo $auths[ $two_auth_id ]['auth_name']  ?></b>
+                                    <ul>
+                                         <!-- 循环顶级（3级权限） -->
+                                        <?php  foreach($children[ $two_auth_id ]?:array() as $three_auth_id):?>
+                                        <li class="son"><input onclick="up_select(this,'{$two_auth_id},{$one_auth_id}');"  type="checkbox" value="<?php echo $three_auth_id; ?>" name="auth_id_list[]"><?php echo $auths[ $three_auth_id ]['auth_name']  ?></li>
+                                         <?php endforeach;?>
+                                    </ul>
+                                </ul>
+                                <?php endforeach;?>
+                            </td>
+                        </tr>
+                    <?php endforeach;?>
+                    </table>
+                </li>
+            </ul>
+            <li>
+                    <label>&nbsp;</label>
+                    <input name="" id="btnSubmit" type="submit" class="btn" value="确认保存" />
+             </li>
+        </form>
+    </div>
+</body>
+</body>
+<script>
+function all_select(obj){
+        $(obj).parent().next().find('input').prop('checked',obj.checked);
+    }
+
+    function up_select(obj,ids){
+        console.log(ids);
+        var arr = ids.split(','); // [1,5]
+        for(var k in arr){
+            $('input[value='+arr[k]+']').prop('checked',true);
+        }
+
+        var length = $(obj).parents("td").find("input[type='checkbox']:checked").length;
+        if(length == 0){
+            $(obj).parents('tr').find('th > input').prop('checked',false);
+        }
+    }
+</script>
+
+</html>

@@ -1,0 +1,25 @@
+{volist name='lists' id='list'}
+						<tr>
+							<td>
+                       		<input name="" type="checkbox" value="" />
+                   			 </td>
+							<td><a href="">{$list['order_id']}</a></td>
+							<td><a href="">{$list['username']}</a></td>
+							<td><a href="">{$list['receiver']}/{$list['address']}</td>
+							<td>{$list['tel']}/{$list['zcode']}</td>
+							<td>￥{$list['total_price']}</td>
+							<td>{:config('pay_status')[$list['pay_status']]}</td>
+							<td>{:config('send_status')[$list['send_status']]}</td>
+							<td>
+								<?php if($list['pay_status']==1&&$list['send_status']==0): ?>
+								<a href="{:url('admin/order/upd',['id'=>$list['id']])}"  class="tablelink">配置物流</a>
+							<?php endif; ?>
+							<?php if($list['pay_status']==1): ?>
+								<a href="javascript:;" number="{$list['number']}" company="{$list['company']}"  class="queryWuliu tablelink">查询物流</a>
+							<?php endif; ?>
+						</td>
+						<td>
+								<a href="javascript:;" id={$list['id']}" class="delAttr">加入回收站</a>
+							</td>
+						</tr>
+						{/volist}
